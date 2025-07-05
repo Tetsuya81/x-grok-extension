@@ -119,8 +119,21 @@
             }
             
             try {
+                // 保存されているプロンプトを取得
+                let textToCopy = postUrl;
+                try {
+                    const result = await chrome.storage.sync.get(['promptTemplate']);
+                    if (result.promptTemplate && result.promptTemplate.trim()) {
+                        // URLの後に改行とプロンプトを追加
+                        textToCopy = `${postUrl}\n\n${result.promptTemplate.trim()}`;
+                    }
+                } catch (storageError) {
+                    console.warn('プロンプト読み込みエラー:', storageError);
+                    // エラーの場合はURLのみコピー
+                }
+                
                 // クリップボードにコピー
-                const copySuccess = await copyToClipboard(postUrl);
+                const copySuccess = await copyToClipboard(textToCopy);
                 
                 if (copySuccess) {
                     // 成功フィードバック
