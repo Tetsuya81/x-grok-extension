@@ -1,13 +1,16 @@
 {
   "manifest_version": 3,
   "name": "X to Grok",
-  "version": "1.1",
+  "version": "1.4.1",
   "description": "x.comのポストにGrokアイコンを追加し、ポストリンクをコピーしてGrokページに移動します",
   "permissions": [
     "clipboardWrite",
     "activeTab",
     "storage"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["https://x.com/*", "https://twitter.com/*"],

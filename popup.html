@@ -4,41 +4,162 @@
   <meta charset="utf-8">
   <style>
     body {
-      width: 300px;
-      padding: 10px;
-      font-family: Arial, sans-serif;
+      width: 320px;
+      padding: 0;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f5f8fa;
     }
+    
+    /* ヘッダー */
+    .header {
+      background: linear-gradient(135deg, #1DA1F2, #0084b4);
+      color: white;
+      padding: 16px;
+      text-align: center;
+    }
+    
     .title {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: bold;
-      margin-bottom: 10px;
-      color: #1DA1F2;
+      margin: 0;
     }
-    .description {
+    
+    .subtitle {
       font-size: 12px;
-      color: #666;
-      line-height: 1.4;
-      margin-bottom: 15px;
+      opacity: 0.9;
+      margin-top: 4px;
     }
-    .settings {
-      border-top: 1px solid #e1e8ed;
-      padding-top: 15px;
+    
+    /* 現在の選択状態表示 */
+    .current-selection {
+      background: white;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e1e8ed;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .settings h3 {
-      font-size: 14px;
-      margin-bottom: 10px;
+    
+    .current-label {
+      font-size: 12px;
+      color: #657786;
+      font-weight: 500;
+    }
+    
+    .current-prompt {
+      font-size: 13px;
       color: #14171a;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+    
+    /* メインコンテンツ */
+    .content {
+      padding: 16px;
+    }
+    
+    /* セクションタイトル */
+    .section-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #14171a;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* プリセットカード */
+    .preset-cards {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .preset-card {
+      background: white;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .preset-card:hover {
+      border-color: #1DA1F2;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .preset-card.selected {
+      border-color: #1DA1F2;
+      background: #f0f8ff;
+    }
+    
+    .preset-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #1DA1F2;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .preset-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    
+    .preset-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #14171a;
+      margin-bottom: 4px;
+    }
+    
+    .preset-description {
+      font-size: 12px;
+      color: #657786;
+      line-height: 1.3;
+    }
+    
+    /* カスタムプロンプト */
+    .custom-section {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+    
     #prompt-template {
       width: 100%;
       min-height: 80px;
-      padding: 8px;
+      padding: 10px;
       border: 1px solid #e1e8ed;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 13px;
       resize: vertical;
       box-sizing: border-box;
+      font-family: inherit;
     }
+    
+    #prompt-template:focus {
+      outline: none;
+      border-color: #1DA1F2;
+    }
+    
     #save-prompt {
       margin-top: 10px;
       padding: 8px 16px;
@@ -50,83 +171,152 @@
       font-size: 14px;
       font-weight: bold;
       width: 100%;
+      transition: background 0.2s;
     }
+    
     #save-prompt:hover {
       background: #1a91da;
     }
+    
     #save-prompt:disabled {
       background: #aab8c2;
       cursor: not-allowed;
     }
+    
     .save-status {
-      margin-top: 10px;
+      margin-top: 8px;
       font-size: 12px;
       text-align: center;
       opacity: 0;
       transition: opacity 0.3s;
     }
+    
     .save-status.show {
       opacity: 1;
     }
+    
     .save-status.success {
       color: #17bf63;
     }
+    
     .save-status.error {
       color: #e0245e;
     }
-    .preset-prompts {
-      margin-top: 15px;
+    
+    /* 使用履歴 */
+    .history-section {
+      margin-top: 16px;
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
     }
-    .preset-prompts h4 {
-      font-size: 12px;
-      margin-bottom: 8px;
-      color: #657786;
+    
+    .history-list {
+      margin-top: 8px;
     }
-    .preset-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .preset {
-      padding: 4px 12px;
+    
+    .history-item {
+      padding: 8px 12px;
       background: #f7f9fa;
-      color: #14171a;
-      border: 1px solid #e1e8ed;
       border-radius: 4px;
+      margin-bottom: 6px;
       cursor: pointer;
       font-size: 12px;
+      color: #14171a;
       transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .preset:hover {
+    
+    .history-item:hover {
       background: #e1e8ed;
-      border-color: #aab8c2;
+    }
+    
+    .history-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .history-time {
+      font-size: 10px;
+      color: #657786;
+      margin-left: 8px;
+    }
+    
+    /* アイコン */
+    .icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      vertical-align: middle;
     }
   </style>
 </head>
 <body>
-  <div class="title">X to Grok</div>
-  <div class="description">
-    x.comのポストにGrokアイコンを追加します。アイコンをクリックするとポストリンクをコピーしてGrokページに移動します。
+  <div class="header">
+    <h1 class="title">X to Grok</h1>
+    <p class="subtitle">プロンプトを選択してください</p>
   </div>
   
-  <div class="settings">
-    <h3>プロンプト設定</h3>
-    <textarea id="prompt-template" placeholder="例：この投稿を要約してください"></textarea>
-    <button id="save-prompt">保存</button>
-    <div class="save-status" id="save-status"></div>
+  <div class="current-selection">
+    <span class="current-label">現在の選択:</span>
+    <span class="current-prompt" id="current-prompt">未選択</span>
+  </div>
+  
+  <div class="content">
+    <div class="section-title">
+      <span class="icon">📝</span>
+      プリセットプロンプト
+    </div>
     
-    <div class="preset-prompts">
-      <h4>プリセット：</h4>
-      <div class="preset-buttons">
-        <button class="preset" data-prompt="この投稿を要約してください">要約</button>
-        <button class="preset" data-prompt="この投稿を日本語に翻訳してください">翻訳</button>
-        <button class="preset" data-prompt="この投稿の内容を分析してください">分析</button>
-        <button class="preset" data-prompt="この投稿について詳しく説明してください">詳細説明</button>
+    <div class="preset-cards">
+      <div class="preset-card" data-prompt="この投稿を要約してください">
+        <div class="preset-icon">📋</div>
+        <div class="preset-title">要約</div>
+        <div class="preset-description">投稿の内容を簡潔にまとめます</div>
       </div>
+      
+      <div class="preset-card" data-prompt="この投稿を日本語に翻訳してください">
+        <div class="preset-icon">🌐</div>
+        <div class="preset-title">翻訳</div>
+        <div class="preset-description">投稿を日本語に翻訳します</div>
+      </div>
+      
+      <div class="preset-card" data-prompt="この投稿の内容を分析してください">
+        <div class="preset-icon">🔍</div>
+        <div class="preset-title">分析</div>
+        <div class="preset-description">投稿の内容を詳しく分析します</div>
+      </div>
+      
+      <div class="preset-card" data-prompt="この投稿について詳しく説明してください">
+        <div class="preset-icon">💡</div>
+        <div class="preset-title">詳細説明</div>
+        <div class="preset-description">投稿の背景や詳細を説明します</div>
+      </div>
+    </div>
+    
+    <div class="custom-section">
+      <div class="section-title">
+        <span class="icon">✏️</span>
+        カスタムプロンプト
+      </div>
+      <textarea id="prompt-template" placeholder="独自のプロンプトを入力してください"></textarea>
+      <button id="save-prompt">カスタムプロンプトを使用</button>
+      <div class="save-status" id="save-status"></div>
+    </div>
+    
+    <div class="history-section" id="history-section" style="display: none;">
+      <div class="section-title">
+        <span class="icon">🕐</span>
+        最近使用したプロンプト
+      </div>
+      <div class="history-list" id="history-list"></div>
     </div>
   </div>
   
   <script src="popup.js"></script>
 </body>
 </html>
-
