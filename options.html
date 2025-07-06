@@ -302,12 +302,12 @@
           <textarea id="new-text" class="form-input form-textarea" placeholder="例: この投稿を要約してください"></textarea>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn" onclick="cancelAddPreset()">キャンセル</button>
-          <button type="button" class="btn btn-primary" onclick="saveNewPreset()">保存</button>
+          <button type="button" class="btn" id="cancel-add-btn">キャンセル</button>
+          <button type="button" class="btn btn-primary" id="save-add-btn">保存</button>
         </div>
       </div>
       
-      <button class="add-button" onclick="showAddPresetForm()">
+      <button class="add-button" id="add-preset-btn">
         新しいプリセットを追加
       </button>
     </div>
@@ -322,8 +322,8 @@
         <textarea id="edit-text" class="form-input form-textarea"></textarea>
       </div>
       <div class="form-actions">
-        <button type="button" class="btn" onclick="cancelEdit()">キャンセル</button>
-        <button type="button" class="btn btn-primary" onclick="saveEdit()">保存</button>
+        <button type="button" class="btn" id="cancel-edit-btn">キャンセル</button>
+        <button type="button" class="btn btn-primary" id="save-edit-btn">保存</button>
       </div>
     </div>
   </div>

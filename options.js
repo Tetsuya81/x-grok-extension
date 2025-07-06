@@ -15,6 +15,24 @@ let editingIndex = -1;
 document.addEventListener('DOMContentLoaded', async () => {
     await loadPresets();
     renderPresets();
+    
+    // ボタンイベントの登録
+    document.getElementById('add-preset-btn').addEventListener('click', showAddPresetForm);
+    document.getElementById('cancel-add-btn').addEventListener('click', cancelAddPreset);
+    document.getElementById('save-add-btn').addEventListener('click', saveNewPreset);
+    document.getElementById('cancel-edit-btn').addEventListener('click', cancelEdit);
+    document.getElementById('save-edit-btn').addEventListener('click', saveEdit);
+    
+    // 動的に生成される編集・削除ボタンはイベント委譲で処理
+    document.getElementById('preset-list').addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-edit')) {
+            const index = parseInt(e.target.dataset.index);
+            editPreset(index);
+        } else if (e.target.classList.contains('btn-delete')) {
+            const index = parseInt(e.target.dataset.index);
+            deletePreset(index);
+        }
+    });
 });
 
 // プリセットを読み込み
@@ -59,8 +77,8 @@ function renderPresets() {
                 <div class="preset-text">${escapeHtml(preset.text)}</div>
             </div>
             <div class="preset-actions">
-                <button class="btn btn-edit" onclick="editPreset(${index})">編集</button>
-                <button class="btn btn-delete" onclick="deletePreset(${index})">削除</button>
+                <button class="btn btn-edit" data-index="${index}">編集</button>
+                <button class="btn btn-delete" data-index="${index}">削除</button>
             </div>
         `;
         
