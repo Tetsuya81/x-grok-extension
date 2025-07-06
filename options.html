@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>X to Grok - 設定</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f8fa;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header h1 {
+      margin: 0;
+      color: #14171a;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .header p {
+      margin: 8px 0 0 0;
+      color: #657786;
+      font-size: 14px;
+    }
+    
+    .section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #14171a;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .preset-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .preset-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid #e1e8ed;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    
+    .preset-item:hover {
+      border-color: #1DA1F2;
+      background: #f0f8ff;
+    }
+    
+    .preset-icon {
+      display: none;
+    }
+    
+    .preset-content {
+      flex: 1;
+    }
+    
+    .preset-text {
+      font-size: 14px;
+      color: #14171a;
+      font-weight: 500;
+    }
+    
+    .preset-description {
+      display: none;
+    }
+    
+    .preset-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn {
+      padding: 6px 12px;
+      border: 1px solid #e1e8ed;
+      border-radius: 4px;
+      background: white;
+      color: #14171a;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    
+    .btn:hover {
+      background: #f7f9fa;
+    }
+    
+    .btn-edit {
+      color: #1DA1F2;
+      border-color: #1DA1F2;
+    }
+    
+    .btn-edit:hover {
+      background: #f0f8ff;
+    }
+    
+    .btn-delete {
+      color: #e0245e;
+      border-color: #e0245e;
+    }
+    
+    .btn-delete:hover {
+      background: #fef2f2;
+    }
+    
+    .btn-primary {
+      background: #1DA1F2;
+      color: white;
+      border-color: #1DA1F2;
+    }
+    
+    .btn-primary:hover {
+      background: #1a91da;
+    }
+    
+    .add-preset-form {
+      display: none;
+      padding: 16px;
+      border: 2px dashed #e1e8ed;
+      border-radius: 6px;
+      margin-top: 12px;
+    }
+    
+    .add-preset-form.show {
+      display: block;
+    }
+    
+    .form-group {
+      margin-bottom: 12px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #14171a;
+      margin-bottom: 4px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #e1e8ed;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #1DA1F2;
+      box-shadow: 0 0 0 3px rgba(29, 161, 242, 0.1);
+    }
+    
+    .form-textarea {
+      min-height: 80px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    
+    .add-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #14171a;
+      color: white;
+      border: 1px solid #14171a;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .add-button:hover {
+      background: #2f3336;
+      border-color: #2f3336;
+    }
+    
+    .status-message {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .status-message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .status-message.show {
+      display: block;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal-overlay.show {
+      display: flex;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #14171a;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>
+        X to Grok 設定
+      </h1>
+      <p>プリセットプロンプトの管理とカスタマイズを行えます</p>
+    </div>
+    
+    <div id="status-message" class="status-message"></div>
+    
+    <div class="section">
+      <div class="section-title">
+        プリセットプロンプト管理
+      </div>
+      
+      <div id="preset-list" class="preset-list">
+        <!-- プリセットアイテムがここに動的に追加されます -->
+      </div>
+      
+      <div id="add-preset-form" class="add-preset-form">
+        <div class="form-group">
+          <label class="form-label">プロンプトテキスト</label>
+          <textarea id="new-text" class="form-input form-textarea" placeholder="例: この投稿を要約してください"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn" onclick="cancelAddPreset()">キャンセル</button>
+          <button type="button" class="btn btn-primary" onclick="saveNewPreset()">保存</button>
+        </div>
+      </div>
+      
+      <button class="add-button" onclick="showAddPresetForm()">
+        新しいプリセットを追加
+      </button>
+    </div>
+  </div>
+  
+  <!-- 編集モーダル -->
+  <div id="edit-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-title">プリセット編集</div>
+      <div class="form-group">
+        <label class="form-label">プロンプトテキスト</label>
+        <textarea id="edit-text" class="form-input form-textarea"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn" onclick="cancelEdit()">キャンセル</button>
+        <button type="button" class="btn btn-primary" onclick="saveEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,13 +1,14 @@
 // background.js - バックグラウンドスクリプト
 
+// 拡張機能アイコンクリックで設定画面を開く
+chrome.action.onClicked.addListener((tab) => {
+    chrome.runtime.openOptionsPage();
+});
+
 // メッセージリスナー
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'openPopup') {
-        // ポップアップを開く（Chrome拡張機能の制限により、直接開くことはできないため、
-        // 拡張機能のアイコンクリックを促すか、オプションページを開く）
-        chrome.action.openPopup().catch(() => {
-            // ポップアップが開けない場合は、オプションページを開く
-            chrome.runtime.openOptionsPage();
-        });
+        // 設定画面を開く
+        chrome.runtime.openOptionsPage();
     }
 });

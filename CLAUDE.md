@@ -78,3 +78,7 @@ document.querySelectorAll('[data-testid="tweet"]')
 ### Update Icon Design
 - Modify styles in both content.js (inline) and styles.css
 - Note: content.js overrides some CSS properties programmatically
+
+## Code Style Guidelines
+
+- **No Emojis**: Do not use emojis in code, comments, or any project documentation

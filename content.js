@@ -361,13 +361,27 @@
         }
     `;
     
-    // プリセットプロンプト
-    const presetPrompts = [
-        { icon: '📋', text: 'この投稿を要約してください' },
-        { icon: '🌐', text: 'この投稿を日本語に翻訳してください' },
-        { icon: '🔍', text: 'この投稿の内容を分析してください' },
-        { icon: '💡', text: 'この投稿について詳しく説明してください' }
+    // デフォルトプリセットプロンプト
+    const DEFAULT_PRESETS = [
+        { text: 'この投稿を要約してください' },
+        { text: 'この投稿を日本語に翻訳してください' },
+        { text: 'この投稿の内容を分析してください' },
+        { text: 'この投稿について詳しく説明してください' }
     ];
+    
+    let presetPrompts = [...DEFAULT_PRESETS];
+    
+    // カスタムプリセットを読み込み
+    async function loadCustomPresets() {
+        try {
+            const result = await chrome.storage.sync.get(['customPresets']);
+            if (result.customPresets && result.customPresets.length > 0) {
+                presetPrompts = result.customPresets;
+            }
+        } catch (error) {
+            console.error('カスタムプリセット読み込みエラー:', error);
+        }
+    }
     
     // モーダルスタイルを注入
     function injectModalStyles() {
@@ -380,7 +394,9 @@
     }
     
     // モーダルを作成
-    function createModal() {
+    async function createModal() {
+        // カスタムプリセットを読み込み
+        await loadCustomPresets();
         const overlay = document.createElement('div');
         overlay.className = 'grok-modal-overlay';
         
@@ -436,10 +452,6 @@
         const templateSection = document.createElement('div');
         templateSection.className = 'grok-template-section';
         
-        const templateLabel = document.createElement('div');
-        templateLabel.className = 'grok-template-label';
-        templateLabel.textContent = 'Template prompt';
-        
         // Template Combobox
         const templateCombobox = document.createElement('div');
         templateCombobox.className = 'grok-template-combobox';
@@ -447,7 +459,7 @@
         const templateInput = document.createElement('input');
         templateInput.className = 'grok-template-input';
         templateInput.type = 'text';
-        templateInput.placeholder = 'プリセットを選択またはカスタム入力...';
+        templateInput.placeholder = 'テンプレートから選択';
         templateInput.readOnly = true;
         
         const templateButton = document.createElement('button');
@@ -492,7 +504,6 @@
         historyContainer.appendChild(historyIcon);
         historyContainer.appendChild(historyMenu);
         
-        templateSection.appendChild(templateLabel);
         templateSection.appendChild(templateCombobox);
         templateSection.appendChild(historyContainer);
         
@@ -833,7 +844,7 @@
             
             // モーダルを表示
             injectModalStyles();
-            const modal = createModal();
+            const modal = await createModal();
             document.body.appendChild(modal);
         };
     }
