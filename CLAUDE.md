@@ -27,6 +27,7 @@ Chrome extension that adds a Grok icon to X.com (Twitter) posts. When clicked, i
   - Uses MutationObserver to detect new posts dynamically
   - Handles clipboard operations with fallback methods
   - Manages visual feedback (icon color changes)
+  - Keyboard shortcuts support (Cmd/Ctrl + Shift + Enter, ESC)
   
 - **manifest.json**: Chrome extension configuration (Manifest V3)
   - Permissions: clipboardWrite, activeTab
@@ -34,7 +35,7 @@ Chrome extension that adds a Grok icon to X.com (Twitter) posts. When clicked, i
 
 ### Key Implementation Details
 
-**Post Detection**: 
+**Post Detection**:
 ```javascript
 document.querySelectorAll('[data-testid="tweet"]')
 ```
@@ -44,9 +45,17 @@ document.querySelectorAll('[data-testid="tweet"]')
 - Fallback: Use current page URL if on individual post page
 
 **Icon Injection**:
-- Adds 24x24px "G" icon to top-right of each post
-- Uses absolute positioning relative to post container
-- Includes hover effects and click feedback
+- Adds 18.75x18.75px "G" icon next to post timestamp
+- Uses inline-flow positioning (inserted after time element)
+- Fallback to absolute positioning if time element not found
+- Includes hover effects defined in CSS
+- Dark mode support with adaptive colors
+
+**Keyboard Shortcuts**:
+- ESC: Close prompt modal
+- Command + Shift + Enter (Mac) / Ctrl + Shift + Enter (Windows/Linux): Execute prompt and navigate to Grok
+- Platform detection via `navigator.platform`
+- Shortcuts active when prompt modal is open
 
 ## Important Considerations
 
@@ -71,13 +80,14 @@ document.querySelectorAll('[data-testid="tweet"]')
 3. Update styles.css for visual changes
 
 ### Fix Icon Not Appearing
-- Check if X.com changed their DOM structure
+- Check if X.com changed their DOM structure (especially `time[datetime]` elements)
 - Verify content script is loading (check DevTools sources)
 - Ensure extension has proper permissions
 
 ### Update Icon Design
-- Modify styles in both content.js (inline) and styles.css
-- Note: content.js overrides some CSS properties programmatically
+- Modify styles in styles.css (primary styling)
+- Inline styles in content.js are minimal (only for fallback positioning)
+- CSS includes dark mode support via @media queries
 
 ## Code Style Guidelines
 

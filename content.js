@@ -552,12 +552,15 @@
             historyMenu.classList.toggle('show');
         });
         
-        // 実行ボタンクリック
-        submitButton.addEventListener('click', () => {
+        // 実行ボタンクリック処理を関数化
+        const handleSubmit = () => {
             const promptText = promptForm.value.trim() || '投稿を分析してください';
             handlePromptSelection(promptText);
             closeModal(overlay);
-        });
+        };
+        
+        // 実行ボタンクリック
+        submitButton.addEventListener('click', handleSubmit);
         
         // プロンプトフォームに設定する関数をグローバルに保存
         window.grokSetPromptInForm = (text) => {
@@ -587,14 +590,29 @@
             templateButton.innerHTML = '∨';
         });
         
-        // ESCキーで閉じる
-        const handleEsc = (e) => {
+        // キーボードショートカット処理
+        const handleKeyboard = (e) => {
+            // ESCキーで閉じる
             if (e.key === 'Escape') {
                 closeModal(overlay);
-                document.removeEventListener('keydown', handleEsc);
+                document.removeEventListener('keydown', handleKeyboard);
+                return;
+            }
+            
+            // Command/Ctrl + Shift + Enter (Return) で実行
+            // Mac: Command (metaKey) + Shift + Enter
+            // Windows/Linux: Ctrl (ctrlKey) + Shift + Enter
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const modifierKey = isMac ? e.metaKey : e.ctrlKey;
+            
+            if (modifierKey && e.shiftKey && (e.key === 'Enter' || e.key === 'Return')) {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSubmit();
+                document.removeEventListener('keydown', handleKeyboard);
             }
         };
-        document.addEventListener('keydown', handleEsc);
+        document.addEventListener('keydown', handleKeyboard);
         
         // 初期プロンプトを読み込み
         loadInitialPrompt(promptForm, templateInput);
@@ -732,49 +750,16 @@
     
     // アイコンを作成する関数
     function createGrokIcon() {
-        const icon = document.createElement('div');
+        const icon = document.createElement('span');
         icon.className = ICON_CLASS;
         icon.title = 'Grokで分析';
         icon.setAttribute('role', 'button');
         icon.setAttribute('tabindex', '0');
-        
-        // アイコンのスタイルを設定
-        Object.assign(icon.style, {
-            position: 'absolute',
-            top: '8px',
-            right: '40px',
-            width: '24px',
-            height: '24px',
-            background: 'linear-gradient(135deg, #1DA1F2, #0084b4)',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            color: 'white',
-            zIndex: '1000',
-            transition: 'all 0.2s ease',
-            opacity: '0.8',
-            fontFamily: 'Arial, sans-serif'
-        });
-        
         icon.textContent = 'G';
-        
-        // ホバー効果
-        icon.addEventListener('mouseenter', () => {
-            icon.style.opacity = '1';
-            icon.style.transform = 'scale(1.1)';
-            icon.style.boxShadow = '0 2px 8px rgba(29, 161, 242, 0.3)';
-        });
-        
-        icon.addEventListener('mouseleave', () => {
-            icon.style.opacity = '0.8';
-            icon.style.transform = 'scale(1)';
-            icon.style.boxShadow = 'none';
-        });
-        
+
+        // スタイルはCSSファイル（styles.css）で定義
+        // インラインスタイルは最小限に（CSSで定義できない場合のみ）
+
         return icon;
     }
     
@@ -855,31 +840,73 @@
         if (postElement.classList.contains(PROCESSED_CLASS)) {
             return;
         }
-        
-        // ポスト要素を相対位置に設定
-        if (getComputedStyle(postElement).position === 'static') {
-            postElement.style.position = 'relative';
+
+        // 既にアイコンが存在する場合もスキップ（重複防止）
+        if (postElement.querySelector('.' + ICON_CLASS)) {
+            postElement.classList.add(PROCESSED_CLASS);
+            return;
         }
-        
-        // アイコンを作成
-        const icon = createGrokIcon();
-        
-        // クリックイベントを追加
-        icon.addEventListener('click', handleIconClick(postElement, icon));
-        
-        // キーボードアクセシビリティ
-        icon.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                icon.click();
-            }
-        });
-        
-        // ポストにアイコンを追加
-        postElement.appendChild(icon);
-        
-        // 処理済みマークを追加
+
+        // 処理済みマークを先に追加（重複防止を強化）
         postElement.classList.add(PROCESSED_CLASS);
+
+        // time要素を探す
+        const timeElement = postElement.querySelector('time[datetime]');
+
+        if (timeElement) {
+            // アイコンを作成
+            const icon = createGrokIcon();
+
+            // クリックイベントを追加
+            icon.addEventListener('click', handleIconClick(postElement, icon));
+
+            // キーボードアクセシビリティ
+            icon.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    icon.click();
+                }
+            });
+
+            // time要素が含まれるdivブロック（親要素）の右隣に挿入
+            const parentElement = timeElement.parentNode;
+            if (parentElement && parentElement.parentNode) {
+                // 親要素の直後にアイコンを挿入
+                parentElement.parentNode.insertBefore(icon, parentElement.nextSibling);
+            } else if (parentElement) {
+                // フォールバック: 親要素が見つからない場合は従来の方法
+                parentElement.insertBefore(icon, timeElement.nextSibling);
+            }
+        } else {
+            // time要素が見つからない場合は従来の方法（絶対配置）
+            // ポスト要素を相対位置に設定
+            if (getComputedStyle(postElement).position === 'static') {
+                postElement.style.position = 'relative';
+            }
+
+            const icon = createGrokIcon();
+
+            // 絶対配置用のスタイルを上書き
+            Object.assign(icon.style, {
+                position: 'absolute',
+                top: '8px',
+                right: '40px',
+                display: 'flex'
+            });
+
+            // クリックイベントを追加
+            icon.addEventListener('click', handleIconClick(postElement, icon));
+
+            // キーボードアクセシビリティ
+            icon.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    icon.click();
+                }
+            });
+
+            postElement.appendChild(icon);
+        }
     }
     
     // 全てのポストを処理する関数
